@@ -14,8 +14,8 @@ import plug_in_link as plug
 
 
 class Handler:
-    def __init__(self, plugin=None):
-        self.plugin = plugin if plugin else plug.AbsPlugInLink()
+    def __init__(self, plugin):
+        self.plugin = plugin
 
     def find_soup(self, url: str, start_p: int = 1, last_p: int = 1, page: bool = False):
         soups = []
@@ -25,7 +25,8 @@ class Handler:
                 html_text = requests.get(url_page).text
                 soup_site = BS(html_text, 'html.parser')
                 soups.append(soup_site)
-            except ConnectionError:
+            except ConnectionError as ex:
+                print(f"[Except] Handler {ex}")
                 return None
         return soups
 
@@ -38,8 +39,8 @@ class Handler:
                 htmls.append(html_text)
             except ConnectionError:
                 return None
-            except:
-                print("Except")
+            except Exception as ex:
+                print("[Except] Handler", ex)
                 return None
 
         return htmls
@@ -55,5 +56,5 @@ if __name__ == '__main__':
 
     soup = h.find_soup(my_url, page=False)
     links = h.links_from_soup(soup[0])
-    print(soup)
+    # print(soup)
     print(*links, sep='\n')

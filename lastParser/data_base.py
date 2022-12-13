@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from dataclasses import dataclass
 
 import psycopg2
@@ -27,31 +28,40 @@ class MongoDB:
 @dataclass
 class ParamData:
     dbname: str = 'my_parser'
-    user: str = 'polina'
-    password: str = 'password'
+    user: str = 'postgres'
+    password: str = 'postgres'
     host: str = 'localhost'
 
-    def dict(self):
-        return {"dbname": self.dbname,
+    def get_params(self):
+        return {
+                # "dbname": self.dbname,
                 "user": self.user,
                 "password": self.password,
-                "host": self.host}
+                "host": self.host,
+                "port": "5432"}
 
 
 class PostgresDB:
     def __init__(self, params: ParamData = ParamData()):
         self._count_insert = 0
-
         self.params = params
-        self.conn = None
-        self.cursor = None
+        self.connection = None
 
     def init_db(self):
-        self.conn = psycopg2.connect(**self.params.dict())
-        self.cursor = self.conn.cursor()
+        self.connection = psycopg2.connect(user="polina",
+                                           database="my_parser",
+                                           password="password",
+                                           host="127.0.0.1")
+        # cursor = self.conn.cursor()
 
     def create_table(self):
         pass
+
+    def check_db(self):
+        with self.connection.cursor() as cursor:
+            cursor.execute("SELECT version();")
+            res = cursor.fetchone()
+        return res
 
     def insert_one(self, prod: dict):
         _id = str(hash(prod.get("name")))
@@ -62,3 +72,9 @@ class PostgresDB:
 
     def select(self):
         pass
+
+
+if __name__ == "__main__":
+    pos = PostgresDB()
+    pos.init_db()
+    print(pos.check_db())

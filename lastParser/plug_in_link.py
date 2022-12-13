@@ -7,24 +7,12 @@ from bs4 import BeautifulSoup as BS
 """
 Плагин для получения ссылок с сайта
 """
-# коммент
-
-
-class AbsPlugInLink:
-    def __init__(self):
-        pass
-
-    def url_page(self, url: str, page: int):
-        return f"{url}$p={page}"
-
-    def links_from_soup(self, soup: bs4.BeautifulSoup):
-        return list(soup.find_all('a'))
 
 
 @dataclass
 class LinkData:
-    home_link: str = None
-    regular_link_p = None
+    home_link: str = ""
+    regular_link_p = None   # Надо бы добавить регулярочку для url_page
     param: str = 'a'
     class_a: str = "l1nk0t22"
 
@@ -36,16 +24,44 @@ class InfoData:
     name_class: str = "ttu50to t18stym3 hbhlhv b1ba12f6 b1wwsurb n1wpn6v7 l14lhr1r"
 
 
-class LavkaPlugInLink(AbsPlugInLink):
+@dataclass
+class NameRabbitMQ:
+    name_exchange_link: str = "LinkLavka"
+    name_exchange_soup: str = "SoupLavka"
+    exchange_type_link: str = "fanout"
+    exchange_type_soup: str = "fanout"
+
+
+class LavkaPlugInLink:
     def __init__(self,
                  get_link: LinkData = LinkData(),
-                 get_info: InfoData = InfoData()):  # Надо бы добавить регулярочку для url_page
+                 get_info: InfoData = InfoData(),
+                 get_rabbit: NameRabbitMQ = NameRabbitMQ()):
 
         self.get_link = get_link
-
         self.get_info = get_info
+        self.get_rabbit = get_rabbit
 
-        super().__init__()
+    def change_get_link(self, **kwargs):
+        self.get_link = LinkData(**kwargs)
+
+    def change_get_info(self, **kwargs):
+        self.get_info = InfoData(**kwargs)
+
+    def change_name_rabbit(self, **kwargs):
+        self.get_rabbit = NameRabbitMQ(**kwargs)
+
+    def get_link_exchange(self):
+        return self.get_rabbit.name_exchange_link
+
+    def get_link_type_exchange(self):
+        return self.get_rabbit.exchange_type_link
+
+    def get_soup_exchange(self):
+        return self.get_rabbit.name_exchange_soup
+
+    def get_soup_type_exchange(self):
+        return self.get_rabbit.exchange_type_soup
 
     def url_page(self, url: str, page: int):
         if self.get_link.regular_link_p: return self.get_link.regular_link_p(url, page)
@@ -63,7 +79,6 @@ class LavkaPlugInLink(AbsPlugInLink):
 
     def find_info(self, html):
         soup = BS(html, 'html.parser')
-        # data = json.loads(soup.find('script', type='application/ld+json').text)
         crash_flag = False
         params = ["calories", "proteins", "fats", "carbohydrates"]
 
@@ -75,16 +90,16 @@ class LavkaPlugInLink(AbsPlugInLink):
         try:
             weight = soup.find('span', class_=self.get_info.weight_class).text.split()[0]
             ans.update({'weight': weight})
-        except:
+        except Exception as ex:
             crash_flag = True
-            print("WEIGHT IS NONE", html)
+            print("[Except] WEIGHT IS NONE", ex)
 
         try:
             price = soup.find('span', class_=self.get_info.price_class).text.split()[0]
             ans.update({'price': price})
-        except:
+        except Exception as ex:
             crash_flag = True
-            print("PRICE IS NONE", html)
+            print("[Except] PRICE IS NONE", ex)
 
         name = soup.find('span', class_=self.get_info.name_class).text
         ans.update({'name': name.replace("\xad", "").replace("\xa0", " ")})
