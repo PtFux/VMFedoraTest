@@ -1,5 +1,5 @@
 /RabbitMQ-test/
-/lastParserNoGit/test_mongo_db.py
-/lastParserNoGit/ReqTest.py
-/lastParserNoGit/ProductProduceReal.py
-/lastParserNoGit/HandlerCopy.py
+/lastParser/test_mongo_db.py
+/lastParser/ReqTest.py
+/lastParser/ProductProduceReal.py
+/lastParser/HandlerCopy.py
