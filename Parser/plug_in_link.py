@@ -7,7 +7,6 @@ from bs4 import BeautifulSoup as BS
 """
 Плагин для получения ссылок с сайта
 """
-# коммент
 
 
 class AbsPlugInLink:
