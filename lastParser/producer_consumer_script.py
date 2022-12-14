@@ -49,7 +49,7 @@ def callback(ch, method, properties, body):
         return
 
     message = str(message)
-    chan.basic_publish(exchange='LinkLavkaSoup', routing_key='', body=message,
+    chan.basic_publish(exchange=plug.get_soup_exchange(), routing_key='', body=message,
                        properties=pika.BasicProperties(
                            delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE))
     ch.basic_ack(delivery_tag=method.delivery_tag)

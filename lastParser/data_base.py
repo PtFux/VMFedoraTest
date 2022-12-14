@@ -51,7 +51,8 @@ class PostgresDB:
         self.connection = psycopg2.connect(user="polina",
                                            database="my_parser",
                                            password="password",
-                                           host="127.0.0.1")
+                                           host="127.0.0.1",
+                                           port="5432")
         # cursor = self.conn.cursor()
 
     def create_table(self):

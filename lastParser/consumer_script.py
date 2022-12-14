@@ -19,9 +19,9 @@ plug = pgl.LavkaPlugInLink()
 # Инициализация сохранения в бд
 save_bd = PostgresDB()
 # Подключение к базе данных
-save_bd.init_db()
+# save_bd.init_db()
 # Создание таблицы в этой базе данных
-save_bd.create_table()
+# save_bd.create_table()
 
 # Настройка exchange в RabbitMQ
 channel.exchange_declare(exchange=plug.get_soup_exchange(), exchange_type=plug.get_soup_type_exchange())
