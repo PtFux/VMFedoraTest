@@ -32,6 +32,20 @@ class NameRabbitMQ:
     exchange_type_soup: str = "fanout"
 
 
+@dataclass
+class ForPostgres:
+    name_table: str = "lavka"
+
+
+ForPostgresColumns = {"_id": ("TEXT", "UNIQUE"),
+                     "name": ("TEXT", ),
+                     "price": ("INT", ),
+                     "calories": ("FLOAT", ),
+                     "proteins": ("FLOAT", ),
+                     "fats": ("FLOAT", ),
+                     "carbohydrates": ("FLOAT", )}
+
+
 class LavkaPlugInLink:
     def __init__(self,
                  get_link: LinkData = LinkData(),
@@ -41,6 +55,8 @@ class LavkaPlugInLink:
         self.get_link = get_link
         self.get_info = get_info
         self.get_rabbit = get_rabbit
+        self.for_postgres = ForPostgres()
+        self.columns_postgres = ForPostgresColumns
 
     def change_get_link(self, **kwargs):
         self.get_link = LinkData(**kwargs)
@@ -85,7 +101,7 @@ class LavkaPlugInLink:
         ans = dict()
         params_soup = soup.find_all("dd")
         for i in range(len(params_soup)):
-            ans.update({params[i]: params_soup[i].text})
+            ans.update({params[i]: float(params_soup[i].text.replace(',', '.'))})
 
         try:
             weight = soup.find('span', class_=self.get_info.weight_class).text.split()[0]
@@ -96,7 +112,7 @@ class LavkaPlugInLink:
 
         try:
             price = soup.find('span', class_=self.get_info.price_class).text.split()[0]
-            ans.update({'price': price})
+            ans.update({'price': int(price)})
         except Exception as ex:
             crash_flag = True
             print("[Except] PRICE IS NONE", ex)
@@ -104,3 +120,9 @@ class LavkaPlugInLink:
         name = soup.find('span', class_=self.get_info.name_class).text
         ans.update({'name': name.replace("\xad", "").replace("\xa0", " ")})
         return ans, crash_flag
+
+    def list_from_dict_for_postgres(self, info: dict):
+        ans = []
+        for cat in self.columns_postgres.keys():
+            ans.append(info.get(cat))
+        return ans

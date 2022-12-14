@@ -17,11 +17,15 @@ channel = connection.channel()
 # Инициализация плагина обработки
 plug = pgl.LavkaPlugInLink()
 # Инициализация сохранения в бд
-save_bd = PostgresDB()
+saver_bd = PostgresDB()
 # Подключение к базе данных
-# save_bd.init_db()
+saver_bd.init_db()
+
 # Создание таблицы в этой базе данных
-# save_bd.create_table()
+# saver_bd.create_table()
+if (plug.for_postgres.name_table, ) not in saver_bd.check_tables():
+    saver_bd.create_table(plug.for_postgres.name_table, plug.columns_postgres)
+    saver_bd.commit_connection()
 
 # Настройка exchange в RabbitMQ
 channel.exchange_declare(exchange=plug.get_soup_exchange(), exchange_type=plug.get_soup_type_exchange())
@@ -42,7 +46,12 @@ def callback(ch, method, properties, body):
 
     info, crash = plug.find_info(html_text)
 
-    save_bd.insert_one(info)
+    saver_bd.insert_one(info)
+
+    value = tuple(plug.list_from_dict_for_postgres(info))
+    print(value)
+    saver_bd.insert(plug.for_postgres.name_table, value)
+    saver_bd.commit_connection()
 
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
