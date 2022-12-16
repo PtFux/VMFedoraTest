@@ -139,10 +139,11 @@ if __name__ == "__main__":
     # print(pos.check_elem("'8685717525016820902'", column="_id", name_table="lavka"))
 
     req = """
-        SELECT floor(proteins * 100 / calories) as protein, name, price, calories, _id
+        SELECT floor(proteins * 100 / calories) as protein, *
         FROM lavka
+        WHERE calories > 0 and proteins > 0
         ORDER BY protein DESC, price
-        LIMIT 10
+        LIMIT 25
         """
     res = pos.my_select(req)
     print(*res, sep='\n')

@@ -44,7 +44,9 @@ ForPostgresColumns = {"_id": ("TEXT", "UNIQUE"),
                      "calories": ("FLOAT", ),
                      "proteins": ("FLOAT", ),
                      "fats": ("FLOAT", ),
-                     "carbohydrates": ("FLOAT", )}
+                     "carbohydrates": ("FLOAT", ),
+                      "link": ("TEXT", )
+                      }
 
 
 class LavkaPlugInLink:
@@ -94,15 +96,18 @@ class LavkaPlugInLink:
         self.get_link.param = param
         self.get_link.class_a = class_a
 
-    def find_info(self, html):
+    def find_info(self, html, link: str = ""):
         soup = BS(html, 'html.parser')
         crash_flag = False
         params = ["calories", "proteins", "fats", "carbohydrates"]
 
         ans = dict()
         params_soup = soup.find_all("dd")
+        for i in range(len(params)):
+            ans.update({params[i]: 0.0})
         for i in range(len(params_soup)):
-            ans.update({params[i]: float(params_soup[i].text.replace(',', '.'))})
+            param = float(params_soup[i].text.replace(',', '.'))
+            ans.update({params[i]: param if param else 0})
 
         try:
             weight = soup.find('span', class_=self.get_info.weight_class).text.split()[0]
@@ -122,6 +127,8 @@ class LavkaPlugInLink:
 
         name = soup.find('span', class_=self.get_info.name_class).text
         ans.update({'name': name.replace("\xad", "").replace("\xa0", " ")})
+
+        ans.update({"link": link})
         return ans, crash_flag
 
     def list_from_dict_for_postgres(self, info: dict):

@@ -42,10 +42,9 @@ print(' [*] Waiting for logs. To exit press CTRL+C')
 
 
 def callback(ch, method, properties, body):
-    html_text = body.decode()
+    html_text, url = body.decode().split("%%%")
 
-    info, crash = plug.find_info(html_text)
-
+    info, crash = plug.find_info(html_text, url)
     saver_bd.insert_one(info)
 
     value = tuple(plug.list_from_dict_for_postgres(info))
