@@ -14,7 +14,8 @@ class LinkData:
     home_link: str = ""
     regular_link_p = None   # Надо бы добавить регулярочку для url_page
     param: str = 'a'
-    class_a: str = "l1nk0t22"
+    class_a_1: str = "l1nk0t22"
+    class_a: str = "l1inc8zk"
 
 
 @dataclass
@@ -109,6 +110,7 @@ class LavkaPlugInLink:
         except Exception as ex:
             crash_flag = True
             print("[Except] WEIGHT IS NONE", ex)
+            ans.update({'weight': 0})
 
         try:
             price = soup.find('span', class_=self.get_info.price_class).text.split()[0]
@@ -116,6 +118,7 @@ class LavkaPlugInLink:
         except Exception as ex:
             crash_flag = True
             print("[Except] PRICE IS NONE", ex)
+            ans.update({'price': 0})
 
         name = soup.find('span', class_=self.get_info.name_class).text
         ans.update({'name': name.replace("\xad", "").replace("\xa0", " ")})

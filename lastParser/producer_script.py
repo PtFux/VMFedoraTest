@@ -31,7 +31,7 @@ with open("web_tasks.txt", 'r') as f:
         soups = h.find_soup(my_url, page=False)
         # достаем ссылки на товары
         links = h.links_from_soup(soups[0])
-
+        print(links)
         for link in links:
             print("[URL] Product's link is", link)
             # кидаем в exchange link

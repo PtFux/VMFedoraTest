@@ -111,6 +111,7 @@ class PostgresDB:
 if __name__ == "__main__":
     from random import randint
 
+    print("Hello")
     pos = PostgresDB()
     pos.init_db()
     print(pos.check_db_version())
@@ -123,10 +124,28 @@ if __name__ == "__main__":
     # print("TABLES", pos.check_tables())
     # print((name, ) in pos.check_tables())
 
-    print(*pos.select_everything("lavka"), sep='\n')
-    # pos.drop_table("lavka")
+    # print(*pos.select_everything("lavka"), sep='\n')
+    # # pos.drop_table("lavka")
+    #
+    # ForPostgresColumns = {"_id": ("TEXT", "UNIQUE"),
+    #                      "name": ("TEXT", ),
+    #                      "price": ("INT", ),
+    #                      "calories": ("FLOAT", ),
+    #                      "proteins": ("FLOAT", ),
+    #                      "fats": ("FLOAT", ),
+    #                      "carbohydrates": ("FLOAT", )}
 
-    print(pos.check_elem("'8685717525016820902'", column="_id", name_table="lavka"))
+
+    # print(pos.check_elem("'8685717525016820902'", column="_id", name_table="lavka"))
+
+    req = """
+        SELECT floor(proteins * 100 / calories) as protein, name, price, calories, _id
+        FROM lavka
+        ORDER BY protein DESC, price
+        LIMIT 10
+        """
+    res = pos.my_select(req)
+    print(*res, sep='\n')
 
     pos.close_connection()
 
